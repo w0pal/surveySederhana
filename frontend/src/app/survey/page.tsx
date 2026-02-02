@@ -54,7 +54,46 @@ export default function SurveyPage() {
   return () => clearTimeout(timer);
  }, [answers, saveAnswers]);
 
+  // Validate required questions for current section
+  const validateSection = (): boolean => {
+    const requiredQuestions: { [key: number]: string[] } = {
+      0: ['q1_age', 'q2_gender', 'q3_education', 'q4_job', 'q5_income', 'q6_province', 'q7_travel_plan'],
+      1: ['q8_no_travel_reason'],
+      2: ['q9_travel_group', 'q10_travel_reason', 'q11_destination_province', 'q12_departure_date', 'q13_departure_time', 'q14_stay_duration', 'q15_budget', 'q16_transport_consideration', 'q17_transportation'],
+      3: getValue('q17_transportation') === 'm' || getValue('q17_transportation') === 'n' 
+        ? ['q18_route', 'q20_rest_interval', 'q21_rest_duration', 'q22_transport_cost']
+        : getValue('q19_route_toll') === 'a'
+        ? ['q19_route_toll', 'q19a_toll_discount', 'q19b_traffic_engineering', 'q19c_rest_area', 'q19d_toll_info_media', 'q20_rest_interval', 'q21_rest_duration', 'q22_transport_cost']
+        : ['q19_route_toll', 'q20_rest_interval', 'q21_rest_duration', 'q22_transport_cost'],
+      4: ['q23_feeder_transport', 'q24_last_mile_transport', 'q25_ticket_purchase', 'q26_alternative_transport'],
+      5: getValue('q29_same_transport') === 'tidak'
+        ? ['q27_return_date', 'q28_return_time', 'q29_same_transport', 'q30_return_transport', 'q31_additional_people']
+        : ['q27_return_date', 'q28_return_time', 'q29_same_transport', 'q31_additional_people'],
+      6: getValue('q33_wfa_perception') === 'setuju'
+        ? ['q32_cancel_reason', 'q33_wfa_perception', 'q34_wfa_preference', 'q35_wfa_start_date', 'q36_change_departure', 'q37_wfa_after_date', 'q38_change_return']
+        : ['q32_cancel_reason', 'q33_wfa_perception'],
+      7: getValue('q39_travel_2025') === 'ya'
+        ? ['q39_travel_2025', 'q40_service_perception', 'q42_reward_preference', 'q43_survey_media', 'q44_willing_respondent', 'q45_whatsapp']
+        : ['q39_travel_2025', 'q42_reward_preference', 'q43_survey_media', 'q44_willing_respondent', 'q45_whatsapp'],
+    };
+
+    const required = requiredQuestions[currentSection] || [];
+    const missing = required.filter(q => !answers[q] || answers[q] === '');
+
+    if (missing.length > 0) {
+      toast.error('Mohon lengkapi semua pertanyaan yang wajib diisi sebelum melanjutkan.');
+      return false;
+    }
+
+    return true;
+  };
+
  const handleNext = async () => {
+    // Validate before proceeding
+    if (!validateSection()) {
+      return;
+    }
+
   await saveAnswers();
 
   // Handle conditional jumping

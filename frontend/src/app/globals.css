@@ -32,7 +32,7 @@
  }
 
  .radio-option {
-  @apply flex items-center p-4 border border-gray-200 rounded-lg 
+  @apply flex items-start p-4 border border-gray-200 rounded-lg 
            cursor-pointer hover:bg-gray-50 transition-colors;
  }
 

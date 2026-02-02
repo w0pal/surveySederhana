@@ -30,7 +30,10 @@ export default function RadioGroup({
    {options.map((option) => (
     <label
      key={option.value}
-     className={clsx('radio-option', value === option.value && 'selected')}
+     className={clsx(
+      'radio-option flex items-start',
+      value === option.value && 'selected'
+     )}
     >
      <input
       type="radio"
@@ -38,9 +41,11 @@ export default function RadioGroup({
       value={option.value}
       checked={value === option.value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500"
+      className="w-4 h-4 mt-0.5 text-primary-600 border-gray-300 focus:ring-primary-500 flex-shrink-0"
      />
-     <span className="ml-3 text-sm text-gray-700">{option.label}</span>
+     <span className="ml-3 text-sm text-gray-700 break-words leading-relaxed">
+      {option.label}
+     </span>
     </label>
    ))}
   </div>
