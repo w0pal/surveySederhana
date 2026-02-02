@@ -1,0 +1,24 @@
+{
+ "name": "survey-backend",
+ "version": "1.0.0",
+ "description": "Backend API for Survey Prakiraan Pergerakan Masyarakat Lebaran 2026",
+ "main": "src/index.js",
+ "scripts": {
+  "start": "node src/index.js",
+  "dev": "nodemon src/index.js",
+  "init-db": "node src/database/init.js"
+ },
+ "dependencies": {
+  "better-sqlite3": "^9.4.3",
+  "cors": "^2.8.5",
+  "dotenv": "^16.4.1",
+  "express": "^4.18.2",
+  "express-validator": "^7.0.1",
+  "helmet": "^7.1.0",
+  "morgan": "^1.10.0",
+  "uuid": "^9.0.1"
+ },
+ "devDependencies": {
+  "nodemon": "^3.0.3"
+ }
+}
