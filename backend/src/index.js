@@ -39,6 +39,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/survey', require('./routes/survey'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/provinces', require('./routes/provinces'));
+app.use('/api/admin/settings', require('./routes/settings'));
 
 // Health check
 app.get('/api/health', (req, res) => {

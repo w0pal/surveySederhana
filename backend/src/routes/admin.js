@@ -1,12 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const SurveyModel = require('../models/surveyModel');
+const SettingsModel = require('../models/settingsModel');
 
-// Simple admin authentication middleware (in production, use proper auth)
+// Admin authentication middleware - checks database first, then env fallback
 const adminAuth = (req, res, next) => {
     const adminKey = req.headers['x-admin-key'];
-    const adminKeyEnv = process.env.PASSWORD_ADMIN;
-    if (adminKey !== adminKeyEnv) {
+
+    // Try to get admin key from database first
+    let storedAdminKey;
+    try {
+        storedAdminKey = SettingsModel.getSetting('admin_key');
+    } catch (error) {
+        console.error('Error getting admin key from database:', error);
+    }
+
+    // Fallback to env if not in database
+    const validAdminKey = storedAdminKey || process.env.PASSWORD_ADMIN;
+
+    if (adminKey !== validAdminKey) {
         return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
     next();

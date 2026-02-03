@@ -112,6 +112,37 @@ export const adminApi = {
   });
   return response.data;
  },
+
+ // Settings API
+ getSettings: async (adminKey: string) => {
+  const response = await api.get('/admin/settings', {
+   headers: { 'x-admin-key': adminKey },
+  });
+  return response.data;
+ },
+
+ updateSettings: async (adminKey: string, settings: Record<string, string>) => {
+  const response = await api.put('/admin/settings', settings, {
+   headers: { 'x-admin-key': adminKey },
+  });
+  return response.data;
+ },
+
+ // GIS API
+ getGeoDistribution: async (adminKey: string) => {
+  const response = await api.get('/admin/settings/geo/distribution', {
+   headers: { 'x-admin-key': adminKey },
+  });
+  return response.data;
+ },
+
+ getProvinceCoordinates: async (adminKey: string) => {
+  const response = await api.get('/admin/settings/geo/provinces', {
+   headers: { 'x-admin-key': adminKey },
+  });
+  return response.data;
+ },
 };
 
 export default api;
+

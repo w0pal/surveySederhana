@@ -39,19 +39,19 @@ router.post('/:responseId/answers', [
 });
 
 // Complete survey
-router.post('/:responseId/complete', [
-    body('whatsapp_number').optional().isMobilePhone('id-ID').withMessage('Nomor WhatsApp tidak valid')
-], (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ success: false, errors: errors.array() });
-    }
-
+router.post('/:responseId/complete', (req, res) => {
     try {
         const { responseId } = req.params;
         const { whatsapp_number } = req.body;
 
-        SurveyModel.completeResponse(responseId, whatsapp_number);
+        // Basic validation - just ensure whatsapp_number is string or undefined
+        let cleanedNumber = null;
+        if (whatsapp_number && typeof whatsapp_number === 'string') {
+            // Remove non-digits except + at the start
+            cleanedNumber = whatsapp_number.trim();
+        }
+
+        SurveyModel.completeResponse(responseId, cleanedNumber);
         res.json({ success: true, message: 'Survey berhasil diselesaikan. Terima kasih atas partisipasi Anda!' });
     } catch (error) {
         console.error('Error completing survey:', error);

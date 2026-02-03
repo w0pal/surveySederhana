@@ -99,11 +99,11 @@ export default function SurveyPage() {
   // Handle conditional jumping
   let nextSection = currentSection + 1;
 
-  // Section 0 (Karakteristik) - Check age
-  if (currentSection === 0 && answers.q1_age === 'a') {
-   toast.error('Maaf, survei ini hanya untuk usia 15 tahun ke atas.');
-   return;
-  }
+  // // Section 0 (Karakteristik) - Check age
+  // if (currentSection === 0 && answers.q1_age === 'a') {
+  //  toast.error('Maaf, survei ini hanya untuk usia 15 tahun ke atas.');
+  //  return;
+  // }
 
   // Section 1 - Check travel plan
   if (currentSection === 0 && answers.q7_travel_plan === 'tidak') {
