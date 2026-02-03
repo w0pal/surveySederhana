@@ -152,8 +152,23 @@ export default function SurveyPage() {
 
  const handlePrevious = () => {
   if (currentSection > 0) {
-   setCurrentSection(currentSection - 1);
-   window.scrollTo(0, 0);
+    let prevSection = currentSection - 1;
+    const travelPlan = answers.q7_travel_plan;
+
+    // If user travels (ya), skip Section 1 when going back
+    // From Section 2 → go back to Section 0
+    if (travelPlan === 'ya' && prevSection === 1) {
+      prevSection = 0;
+    }
+
+    // If user doesn't travel (tidak), skip Sections 2-6 when going back
+    // From Section 7 → go back to Section 1
+    if (travelPlan === 'tidak' && prevSection >= 2 && prevSection <= 6) {
+      prevSection = 1;
+    }
+
+    setCurrentSection(prevSection);
+    window.scrollTo(0, 0);
   }
  };
 
