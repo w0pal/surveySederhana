@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const SurveyModel = require('../models/surveyModel');
 const { body, validationResult } = require('express-validator');
+const { surveyLimiter } = require('../middleware/rateLimiter');
 
-// Start new survey response
-router.post('/start', (req, res) => {
+// Start new survey response (with rate limiting)
+router.post('/start', surveyLimiter, (req, res) => {
     try {
         const response = SurveyModel.createResponse({
             ip_address: req.ip,
@@ -38,8 +39,8 @@ router.post('/:responseId/answers', [
     }
 });
 
-// Complete survey
-router.post('/:responseId/complete', (req, res) => {
+// Complete survey (with rate limiting)
+router.post('/:responseId/complete', surveyLimiter, (req, res) => {
     try {
         const { responseId } = req.params;
         const { whatsapp_number } = req.body;

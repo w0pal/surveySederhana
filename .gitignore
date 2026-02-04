@@ -1,6 +1,5 @@
 # Dependencies
 node_modules/
-.next/
 
 # Database
 data/*.db
@@ -18,10 +17,10 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 
-# 
-
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+
+database-seeder/

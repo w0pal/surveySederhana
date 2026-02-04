@@ -1,14 +1,19 @@
 const db = require('../database/connection');
+const bcrypt = require('bcryptjs');
 
 class SettingsModel {
     // Get all settings
     static getAllSettings() {
         const stmt = db.prepare('SELECT key, value FROM app_settings');
         const rows = stmt.all();
-        return rows.reduce((acc, row) => {
-            acc[row.key] = row.value;
+        const settings = rows.reduce((acc, row) => {
+            // Don't expose admin_key hash in getAllSettings
+            if (row.key !== 'admin_key') {
+                acc[row.key] = row.value;
+            }
             return acc;
         }, {});
+        return settings;
     }
 
     // Get single setting
@@ -18,21 +23,43 @@ class SettingsModel {
         return row ? row.value : null;
     }
 
-    // Update settings
+    // Update settings (handles admin_key specially with hashing)
     static updateSettings(settings) {
         const updateStmt = db.prepare('UPDATE app_settings SET value = ? WHERE key = ?');
         const insertStmt = db.prepare('INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)');
 
         const transaction = db.transaction((settings) => {
             for (const [key, value] of Object.entries(settings)) {
-                const result = updateStmt.run(value, key);
+                let valueToStore = value;
+
+                // Hash admin_key before storing
+                if (key === 'admin_key' && value) {
+                    valueToStore = bcrypt.hashSync(value, 10);
+                }
+
+                const result = updateStmt.run(valueToStore, key);
                 if (result.changes === 0) {
-                    insertStmt.run(key, value);
+                    insertStmt.run(key, valueToStore);
                 }
             }
         });
 
         transaction(settings);
+        return { success: true };
+    }
+
+    // Verify admin key (for authentication)
+    static verifyAdminKey(plainPassword) {
+        const hashedKey = this.getSetting('admin_key');
+        if (!hashedKey) return false;
+        return bcrypt.compareSync(plainPassword, hashedKey);
+    }
+
+    // Set admin key (for password change)
+    static setAdminKey(newPassword) {
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+        const stmt = db.prepare('UPDATE app_settings SET value = ? WHERE key = ?');
+        stmt.run(hashedPassword, 'admin_key');
         return { success: true };
     }
 

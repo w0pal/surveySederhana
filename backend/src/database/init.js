@@ -85,19 +85,41 @@ function initializeDatabase() {
     )
   `);
 
-  // Insert default app settings
+  // Insert default app settings (NOT including admin_key)
   const defaultSettings = [
     ['app_name', 'Survey Lebaran 2026'],
     ['app_version', '1.0.0'],
     ['copyright_text', 'Survey Sederhana'],
     ['copyright_year', '2026'],
     ['logo_url', ''],
-    ['admin_key', process.env.PASSWORD_ADMIN || 'admin123']  // Default admin key
   ];
   const insertSetting = db.prepare('INSERT OR IGNORE INTO app_settings (key, value) VALUES (?, ?)');
   for (const setting of defaultSettings) {
     insertSetting.run(setting[0], setting[1]);
   }
+
+  // Handle admin_key separately with bcrypt hashing
+  // Only set if not already in database (preserve password changes)
+  const bcrypt = require('bcryptjs');
+  const checkAdminKey = db.prepare('SELECT value FROM app_settings WHERE key = ?');
+  const existingAdminKey = checkAdminKey.get('admin_key');
+
+  if (!existingAdminKey) {
+    // First time setup - hash the password from env or use secure default
+    const defaultPassword = process.env.PASSWORD_ADMIN;
+    if (!defaultPassword) {
+      console.warn('⚠️  WARNING: PASSWORD_ADMIN not set in environment!');
+      console.warn('⚠️  Please set PASSWORD_ADMIN in .env file for security.');
+      console.warn('⚠️  Using temporary password. CHANGE IT IMMEDIATELY!');
+    }
+    const passwordToHash = defaultPassword || 'changeme123';
+    const hashedPassword = bcrypt.hashSync(passwordToHash, 10);
+    insertSetting.run('admin_key', hashedPassword);
+    console.log('🔐 Admin key initialized (hashed)');
+  } else {
+    console.log('🔐 Admin key already exists in database (preserved)');
+  }
+
 
   // Create province_coordinates table for GIS
   db.exec(`
