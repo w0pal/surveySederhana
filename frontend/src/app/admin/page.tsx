@@ -45,9 +45,7 @@ export default function AdminPage() {
   async (page = 1) => {
    setIsLoading(true);
    try {
-    const result = await adminApi.getResponses(page, 20, adminKey, {
-     is_complete: 1,
-    });
+    const result = await adminApi.getResponses(page, 20, adminKey, {});
     setResponses(result.data);
     setPagination(result.pagination);
    } catch (error: any) {

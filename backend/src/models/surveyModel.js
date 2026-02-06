@@ -175,10 +175,10 @@ class SurveyModel {
         return stats;
     }
 
-    // Export all data
+    // Export all data (including incomplete responses for data cleaning)
     static exportAllData() {
         const responses = db.prepare(`
-      SELECT * FROM survey_responses WHERE is_complete = 1 ORDER BY created_at DESC
+      SELECT * FROM survey_responses ORDER BY created_at DESC
     `).all();
 
         const answersStmt = db.prepare(`
